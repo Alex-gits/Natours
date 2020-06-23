@@ -110,7 +110,7 @@ exports.deleteTour = async (req, res) => {
   }
 };
 
-exports.getTourStats = async (req, res) => {
+exports.getToursStats = async (req, res) => {
   try {
     const stats = await Tour.aggregate([
       {
@@ -139,6 +139,7 @@ exports.getTourStats = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
+      results: stats.length,
       data: {
         stats
       }
