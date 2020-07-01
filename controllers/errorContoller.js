@@ -7,9 +7,10 @@ const handleCastErrorDB = err => {
 };
 
 const handleDublicateFieldsDB = err => {
-  const message = `Dublicate field value: '${err.keyValue.name}'. Please use another name!`;
+  const duplicate = Object.keys(err.keyValue)[0];
+  const errMessage = `Provided '${duplicate}' is already taken. Please use another value!`;
 
-  return new AppError(message, 400);
+  return new AppError(errMessage, 400);
 };
 
 const handleValidationErrorDB = err => {
@@ -38,7 +39,7 @@ const sendErrorProd = (err, res) => {
 
     res.status(err.statusCode).json({
       status: err.status,
-      message: message
+      message
     });
 
     // Programming or other unknown error: don't want to leak details to client
@@ -58,10 +59,15 @@ module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
+  // console.log(err.status);
+  // console.log(err.statusCode);
+  // console.log(err.message);
+
   if (process.env.NODE_ENV === 'development') {
     sendErrorForDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
+    if (err.message) error.message = err.message;
 
     if (error.kind === 'ObjectId') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDublicateFieldsDB(error);
