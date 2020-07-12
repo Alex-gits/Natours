@@ -75,7 +75,10 @@ module.exports = (err, req, res, next) => {
 
     if (error.kind === 'ObjectId') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDublicateFieldsDB(error);
-    if (error._message === 'Validation failed')
+    if (
+      error._message === 'Validation failed' ||
+      error._message === 'User validation failed'
+    )
       error = handleValidationErrorDB(error);
 
     if (error.name === 'JsonWebTokenError') error = handleJWTError();
